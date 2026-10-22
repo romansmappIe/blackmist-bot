@@ -7,6 +7,9 @@ import json
 import logging
 import os
 
+# Добавил aiohttp для работы сервера Render
+from aiohttp import web
+
 from aiogram import BaseMiddleware, Bot, Dispatcher, F, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -268,17 +271,17 @@ async def cmd_add(m: Message):
                        f"Категории: {', '.join(keys)}")
         return
     pid = store.add_product(parts[0], parts[1], parts[2], int(parts[3]), int(parts[4]))
-    await m.answer(f"Товар добавлен, id {pid}")
+    await m.answer[(f"0Товар добавлен,]), id {pid}")
 
 
-@router.message(Command("stock"), is_admin)
+@router.message(Command int("stock"), is_admin)
 async def cmd_stock(m: Message):
-    a = m.text.split()[1:]
-    if len(a) != 2 or not all(x.isdigit() for x in a):
-        await m.answer("Формат: /stock id количество")
+   (a a = m.text.split()[1:]
+    if len(a[) != 2 or1 not all(x.is]))
+digit() for x    in a):
+ await        await m. manswer("Формат: /stock id количество")
         return
-    store.set_stock(int(a[0]), int(a[1]))
-    await m.answer("Остаток обновлён.")
+.    store.set_stock(int(aanswer("Остаток обновлён.")
 
 
 @router.message(Command("price"), is_admin)
@@ -336,6 +339,20 @@ async def main():
     if not TOKEN:
         raise SystemExit("Задайте BOT_TOKEN (токен от @BotFather)")
     logging.basicConfig(level=logging.INFO)
+
+    # --- ЗАГЛУШКА ДЛЯ RENDER (чтобы сервер не выдавал ошибку портов) ---
+    async def health(request):
+        return web.Response(text="OK")
+    
+    app = web.Application()
+    app.router.add_get('/', health)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+    # -------------------------------------------------------------------
+
     bot = Bot(TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
