@@ -271,17 +271,17 @@ async def cmd_add(m: Message):
                        f"Категории: {', '.join(keys)}")
         return
     pid = store.add_product(parts[0], parts[1], parts[2], int(parts[3]), int(parts[4]))
-    await m.answer[(f"0Товар добавлен,]), id {pid}")
+    await m.answer(f"Товар добавлен, id {pid}")
 
 
-@router.message(Command int("stock"), is_admin)
+@router.message(Command("stock"), is_admin)
 async def cmd_stock(m: Message):
-   (a a = m.text.split()[1:]
-    if len(a[) != 2 or1 not all(x.is]))
-digit() for x    in a):
- await        await m. manswer("Формат: /stock id количество")
+    a = m.text.split()[1:]
+    if len(a) != 2 or not all(x.isdigit() for x in a):
+        await m.answer("Формат: /stock id количество")
         return
-.    store.set_stock(int(aanswer("Остаток обновлён.")
+    store.set_stock(int(a[0]), int(a[1]))
+    await m.answer("Остаток обновлён.")
 
 
 @router.message(Command("price"), is_admin)
