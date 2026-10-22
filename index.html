@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Black Mist</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#000;--card:#0c0c10;--card2:#14141a;--ink:#f2f2f5;--mut:#8b8b98;--ac:#35f0c8;--ac2:#7affe0;--line:#1d1d25;--chip:#15151c;--bad:#ff4d7a;
+box-sizing:border-box;color-scheme:dark}
+*{-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:#000}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+#app{position:relative;max-width:440px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px);overflow:hidden}
+.pv #app{margin:16px auto;min-height:760px;border:1px solid var(--line);border-radius:24px}
+.mist{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.mist i{position:absolute;width:320px;height:320px;border-radius:50%;filter:blur(70px);opacity:.22;animation:drift 18s ease-in-out infinite alternate}
+.mist i:nth-child(1){background:#35f0c8;left:-120px;top:-100px}
+.mist i:nth-child(2){background:#8a5cff;right:-140px;top:260px;animation-duration:24s;animation-delay:-6s}
+.mist i:nth-child(3){background:#ff4d9d;left:-100px;top:640px;animation-duration:30s;opacity:.14}
+@keyframes drift{to{transform:translate(50px,60px) scale(1.15)}}
+#app>*:not(.mist){position:relative;z-index:1}
+.tgbar{display:none;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);font-size:14px}
+.pv .tgbar{display:flex}
+.tgbar b{font-weight:600;display:block;text-align:center}
+.tgbar small{display:block;color:var(--mut);font-size:11px;text-align:center}
+.tgbar span{color:var(--ac);min-width:56px}
+section{padding:18px 14px 8px}
+.logo{font-weight:800;letter-spacing:.28em;font-size:12px;color:var(--ac);text-shadow:0 0 14px rgba(53,240,200,.7);margin:0 0 6px}
+h1{font-size:26px;margin:0 0 2px;letter-spacing:-.01em}
+.sub{color:var(--mut);font-size:13px;margin:0 0 14px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:8px 14px;border-radius:20px;font:inherit;font-size:13px;cursor:pointer;transition:.15s}
+.chip.on{background:var(--ac);border-color:var(--ac);color:#001a14;font-weight:600;box-shadow:0 0 18px rgba(53,240,200,.35)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:8px;display:flex;flex-direction:column;transition:transform .15s,border-color .15s}
+.card:active{transform:scale(.985)}
+.img{position:relative;border-radius:13px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden;
+background:radial-gradient(circle at 50% 62%,hsl(var(--h) 90% 55% / .28),transparent 62%),#050507}
+.img::after{content:"";position:absolute;left:18%;right:18%;bottom:7%;height:8%;border-radius:50%;background:hsl(var(--h) 100% 60% / .35);filter:blur(8px)}
+.img svg{height:86%;position:relative;z-index:1;filter:drop-shadow(0 0 10px hsl(var(--h) 100% 55% / .45));animation:bob 4.5s ease-in-out infinite}
+.card:nth-child(even) .img svg{animation-delay:-2s}
+@keyframes bob{50%{transform:translateY(-3px) rotate(1.2deg)}}
+.bub{animation:rise 3.4s ease-in infinite}
+.bub:nth-of-type(2n){animation-duration:4.6s;animation-delay:-1.4s}
+@keyframes rise{0%{transform:translateY(8px);opacity:0}25%{opacity:.9}100%{transform:translateY(-22px);opacity:0}}
+.led{animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+.tag{position:absolute;z-index:2;top:6px;left:6px;font-size:10px;font-weight:700;letter-spacing:.06em;padding:3px 7px;border-radius:8px;background:hsl(var(--h) 90% 60%);color:#000}
+.nm{font-size:13px;font-weight:600;margin:9px 2px 2px;min-height:34px}
+.ds{font-size:11px;color:var(--mut);margin:0 2px 8px}
+.row{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding:0 2px}
+.pr{font-weight:700;font-size:14px}
+.add,.st button{border:0;background:var(--ac);color:#001a14;width:32px;height:32px;border-radius:11px;font-size:19px;font-weight:700;line-height:1;cursor:pointer}
+.add{box-shadow:0 0 14px rgba(53,240,200,.4)}
+.st{display:flex;align-items:center;gap:8px}
+.st button.m{background:var(--chip);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+.st span{min-width:16px;text-align:center;font-weight:700}
+.item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px;margin-bottom:8px}
+.item .img{width:56px;flex:none;border-radius:11px}
+.item .img::after{display:none}
+.item .tag{display:none}
+.item .img svg{animation:none}
+.item .t{flex:1;font-size:13px;font-weight:600}
+.item .t i{display:block;font-style:normal;color:var(--mut);font-size:12px;font-weight:400}
+input{width:100%;box-sizing:border-box;margin:0 0 8px;padding:13px;border-radius:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
+input::placeholder{color:#5d5d6a}
+input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px rgba(53,240,200,.15)}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin:0 0 6px}
+.back{border:0;background:none;color:var(--ac);font:inherit;padding:0 0 10px;cursor:pointer}
+.big{border:0;background:var(--ac);color:#001a14;width:100%;padding:15px;border-radius:15px;font:inherit;font-weight:700;cursor:pointer;box-shadow:0 0 22px rgba(53,240,200,.35)}
+.bar{margin:auto 14px 14px;position:sticky;bottom:14px;width:calc(100% - 28px)}
+.mid{text-align:center;padding:56px 10px}
+.ok{width:76px;height:76px;border-radius:50%;background:var(--ac);color:#001a14;font-size:36px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 34px rgba(53,240,200,.5)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="mist"><i></i><i></i><i></i></div>
+<div class="tgbar" id="tgbar"><span>ÐÐ°ÐºÑÑÑÑ</span><div><b>Black Mist</b><small>Ð¼Ð¸Ð½Ð¸-Ð¿ÑÐ¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ</small></div><span style="text-align:right">â¯</span></div>
+<section id="gate">
+<div class="mid"><div class="ok" style="font-size:26px">18+</div><div class="logo">BLACK MIST</div><h1>Ð¢Ð¾Ð»ÑÐºÐ¾ Ð´Ð»Ñ Ð²Ð·ÑÐ¾ÑÐ»ÑÑ</h1><p class="sub">Ð¢Ð¾Ð²Ð°ÑÑ Ð¿ÑÐµÐ´Ð½Ð°Ð·Ð½Ð°ÑÐµÐ½Ñ Ð´Ð»Ñ Ð»Ð¸Ñ ÑÑÐ°ÑÑÐµ 18 Ð»ÐµÑ. ÐÐ¾Ð´ÑÐ²ÐµÑÐ´Ð¸ÑÐµ Ð²Ð¾Ð·ÑÐ°ÑÑ, ÑÑÐ¾Ð±Ñ Ð¿ÑÐ¾Ð´Ð¾Ð»Ð¶Ð¸ÑÑ.</p><button class="big" data-a="age">ÐÐ½Ðµ ÐµÑÑÑ 18 Ð»ÐµÑ</button></div>
+</section>
+<section id="shop" hidden>
+<div class="logo">BLACK MIST</div><h1>ÐÐ°ÑÐ°Ð»Ð¾Ð³</h1><p class="sub">ÐÐ¸Ð´ÐºÐ¾ÑÑÐ¸, Ð¾Ð´Ð½Ð¾ÑÐ°Ð·ÐºÐ¸, Ð¿Ð¾Ð´-ÑÐ¸ÑÑÐµÐ¼Ñ Ð¸ ÑÐ°ÑÑÐ¾Ð´Ð½Ð¸ÐºÐ¸</p>
+<div class="chips" id="chips"></div><div class="grid" id="grid"></div>
+</section>
+<section id="cart" hidden>
+<button class="back" data-a="back">â Ð ÐºÐ°ÑÐ°Ð»Ð¾Ð³</button><h1>ÐÐ¾ÑÐ·Ð¸Ð½Ð°</h1>
+<div id="items" style="margin-top:12px"></div>
+<div id="form">
+<input id="n" placeholder="ÐÐ°Ðº Ðº Ð²Ð°Ð¼ Ð¾Ð±ÑÐ°ÑÐ°ÑÑÑÑ" autocomplete="name">
+<input id="c" placeholder="Ð¢ÐµÐ»ÐµÑÐ¾Ð½ Ð¸Ð»Ð¸ @username" autocomplete="tel">
+<input id="a" placeholder="ÐÐ´ÑÐµÑ Ð´Ð¾ÑÑÐ°Ð²ÐºÐ¸ Ð¸Ð»Ð¸ Â«ÑÐ°Ð¼Ð¾Ð²ÑÐ²Ð¾Ð·Â»" autocomplete="street-address">
+<p class="err" id="err"></p>
+</div>
+</section>
+<section id="done" hidden>
+<div class="mid"><div class="ok">â</div><h1>ÐÐ°ÐºÐ°Ð· Ð¿ÑÐ¸Ð½ÑÑ</h1><p class="sub" id="sum"></p><button class="big" data-a="again">Ð Ð¼Ð°Ð³Ð°Ð·Ð¸Ð½</button></div>
+</section>
+<button class="big bar" id="bar" hidden></button>
+</div>
+<script>
+// [id, ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ, Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ, Ð¾Ð¿Ð¸ÑÐ°Ð½Ð¸Ðµ, ÑÐµÐ½Ð°, Ð¾ÑÑÐ°ÑÐ¾Ðº, ÑÐ¸Ð¿ ÐºÐ°ÑÑÐ¸Ð½ÐºÐ¸, Ð¾ÑÑÐµÐ½Ð¾Ðº, Ð¼ÐµÑÐºÐ°]
+const P=[
+[1,'liquids','ÐÐ»ÑÐ±Ð½Ð¸ÐºÐ°-ÐÐ¸Ð²Ð¸ 30 Ð¼Ð»','Ð¡Ð¾Ð»ÐµÐ²Ð¾Ð¹, 20 Ð¼Ð³',450,25,'l',345,'Ð¥ÐÐ¢'],
+[2,'liquids','ÐÑÑÐ° 30 Ð¼Ð»','Ð¡Ð¾Ð»ÐµÐ²Ð¾Ð¹, 20 Ð¼Ð³',450,18,'l',165,''],
+[3,'liquids','Ð¢Ð°Ð±Ð°Ðº 30 Ð¼Ð»','Ð¡Ð¾Ð»ÐµÐ²Ð¾Ð¹, 20 Ð¼Ð³',430,12,'l',32,''],
+[4,'disposable','ÐÐ´Ð½Ð¾ÑÐ°Ð·ÐºÐ° Â«ÐÐ°Ð½Ð³Ð¾Â»','800 Ð·Ð°ÑÑÐ¶ÐµÐº',700,30,'d',42,''],
+[5,'disposable','ÐÐ´Ð½Ð¾ÑÐ°Ð·ÐºÐ° Â«ÐÑÐ±ÑÐ·Â»','1500 Ð·Ð°ÑÑÐ¶ÐµÐº',950,20,'d',140,'NEW'],
+[6,'pods','ÐÐ¾Ð´-ÑÐ¸ÑÑÐµÐ¼Ð° Slim','450 Ð¼ÐÑ, ÑÑÑÐ½Ð°Ñ',1800,8,'p',190,''],
+[7,'pods','ÐÐ¾Ð´-ÑÐ¸ÑÑÐµÐ¼Ð° Pro','800 Ð¼ÐÑ, ÑÐµÑÐ°Ñ',2600,5,'p',265,''],
+[8,'parts','ÐÐ°ÑÑÑÐ¸Ð´Ð¶ 1.0 ÐÐ¼','2 ÑÑ. Ð´Ð»Ñ Slim',350,40,'c',200,''],
+[9,'parts','ÐÑÐ¿Ð°ÑÐ¸ÑÐµÐ»Ñ 0.8 ÐÐ¼','5 ÑÑ. Ð´Ð»Ñ Pro',600,22,'c',290,'']];
+const C=[['all','ÐÑÐµ'],['liquids','ÐÐ¸Ð´ÐºÐ¾ÑÑÐ¸'],['disposable','ÐÐ´Ð½Ð¾ÑÐ°Ð·ÐºÐ¸'],['pods','ÐÐ¾Ð´-ÑÐ¸ÑÑÐµÐ¼Ñ'],['parts','Ð Ð°ÑÑÐ¾Ð´Ð½Ð¸ÐºÐ¸']];
+const $=id=>document.getElementById(id),tg=window.Telegram&&window.Telegram.WebApp,inTg=!!(tg&&tg.initData);
+const R=v=>v+' â½',pr=id=>P.find(p=>p[0]==id);
+let cart={},cat='all',cur=null,uid=0;
+
+function art(k,h){
+const u='g'+(++uid),a='hsl('+h+' 95% 58%)',b='hsl('+h+' 90% 30%)',c='hsl('+((h+28)%360)+' 100% 76%)';
+const defs='<defs><linearGradient id="'+u+'l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+c+'"/><stop offset=".45" stop-color="'+a+'"/><stop offset="1" stop-color="'+b+'"/></linearGradient>'
++'<linearGradient id="'+u+'s" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".35" stop-color="#fff" stop-opacity=".03"/><stop offset=".8" stop-color="#fff" stop-opacity=".1"/><stop offset="1" stop-color="#fff" stop-opacity=".02"/></linearGradient>'
++'<clipPath id="'+u+'c"><rect x="28" y="46" width="44" height="64" rx="13"/></clipPath>'
++'<clipPath id="'+u+'d"><rect x="32" y="24" width="36" height="88" rx="17"/></clipPath>'
++'<clipPath id="'+u+'w"><rect x="38" y="44" width="24" height="34" rx="9"/></clipPath></defs>';
+const bubs=(cx)=>cx.map((x,i)=>'<circle class="bub" cx="'+x[0]+'" cy="'+x[1]+'" r="'+x[2]+'" fill="#fff" fill-opacity=".55" style="animation-delay:-'+(i*.9)+'s"/>').join('');
+const s={
+l:'<rect x="43" y="8" width="14" height="15" rx="4" fill="#0b0b10" stroke="'+c+'" stroke-opacity=".7"/><rect x="46.5" y="22" width="7" height="22" rx="3.5" fill="url(#'+u+'s)" stroke="#fff" stroke-opacity=".25"/><rect x="48" y="30" width="4" height="14" rx="2" fill="'+a+'" opacity=".9"/><rect x="38" y="38" width="24" height="10" rx="4" fill="#0b0b10" stroke="'+c+'" stroke-opacity=".5"/><rect x="28" y="46" width="44" height="64" rx="13" fill="#ffffff0d"/><g clip-path="url(#'+u+'c)"><path d="M20 70 Q31 63 42 70 T64 70 T86 70 V116 H20Z" fill="url(#'+u+'l)"/>'+bubs([[38,100,2],[55,94,2.6],[47,86,1.6],[60,104,1.8]])+'</g><rect x="28" y="46" width="44" height="64" rx="13" fill="url(#'+u+'s)" stroke="#fff" stroke-opacity=".3"/><rect x="34" y="84" width="32" height="16" rx="4" fill="#000" fill-opacity=".55"/><rect x="38" y="89" width="14" height="2.6" rx="1.3" fill="'+c+'"/><rect x="38" y="94" width="22" height="2" rx="1" fill="#fff" fill-opacity=".4"/><rect x="32.5" y="52" width="3.6" height="26" rx="1.8" fill="#fff" fill-opacity=".45"/><path d="M83 22 q6 9 0 14 q-6 -5 0 -14z" fill="'+c+'"/><path d="M18 52 q4 6 0 10 q-4 -4 0 -10z" fill="'+a+'" opacity=".8"/>',
+d:'<rect x="43" y="8" width="14" height="20" rx="6" fill="#0b0b10" stroke="'+c+'" stroke-opacity=".6"/><rect x="32" y="24" width="36" height="88" rx="17" fill="url(#'+u+'l)"/><g clip-path="url(#'+u+'d)"><rect x="32" y="64" width="36" height="9" fill="#000" fill-opacity=".28"/><circle cx="50" cy="38" r="11" fill="#fff" fill-opacity=".1"/></g><rect x="38" y="44" width="24" height="34" rx="9" fill="#000" fill-opacity=".62" stroke="#fff" stroke-opacity=".25"/><g clip-path="url(#'+u+'w)"><rect x="38" y="58" width="24" height="24" fill="'+c+'" opacity=".95"/>'+bubs([[46,74,1.6],[55,70,1.3]])+'</g><ellipse class="led" cx="50" cy="95" rx="8" ry="3.4" fill="'+c+'"/><ellipse cx="50" cy="95" rx="13" ry="6" fill="'+c+'" opacity=".22"/><rect x="36.5" y="32" width="3.6" height="70" rx="1.8" fill="#fff" fill-opacity=".38"/><path d="M72 6 q8 6 0 12 t0 12" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>',
+p:'<rect x="36" y="6" width="28" height="26" rx="8" fill="url(#'+u+'s)" stroke="'+c+'" stroke-opacity=".7"/><rect x="40" y="16" width="20" height="12" rx="4" fill="url(#'+u+'l)"/><rect x="26" y="26" width="48" height="88" rx="16" fill="#101016" stroke="'+a+'" stroke-opacity=".8" stroke-width="1.6"/><rect x="26" y="26" width="48" height="88" rx="16" fill="url(#'+u+'s)"/><rect x="35" y="42" width="30" height="30" rx="8" fill="#000" stroke="#fff" stroke-opacity=".18"/><rect x="39" y="47" width="22" height="4" rx="2" fill="'+c+'"/><rect x="39" y="55" width="16" height="4" rx="2" fill="'+a+'"/><rect x="39" y="63" width="9" height="4" rx="2" fill="'+b+'"/><circle class="led" cx="50" cy="92" r="8.5" fill="'+a+'"/><circle cx="50" cy="92" r="14" fill="'+a+'" opacity=".2"/><circle cx="50" cy="92" r="3.4" fill="#fff" fill-opacity=".75"/><rect x="31.5" y="34" width="3.2" height="70" rx="1.6" fill="#fff" fill-opacity=".3"/>',
+c:'<rect x="22" y="38" width="26" height="70" rx="8" fill="#ffffff0d"/><rect x="26" y="68" width="18" height="36" rx="5" fill="url(#'+u+'l)"/>'+bubs([[35,92,1.6],[31,84,1.2]])+'<rect x="22" y="38" width="26" height="70" rx="8" fill="url(#'+u+'s)" stroke="#fff" stroke-opacity=".3"/><rect x="28" y="26" width="14" height="14" rx="4" fill="#0b0b10" stroke="'+c+'" stroke-opacity=".7"/><rect x="56" y="96" width="30" height="10" rx="4" fill="#0b0b10" stroke="'+a+'" stroke-opacity=".8"/><path d="M60 96 V90 M82 96 V90" stroke="'+a+'" stroke-width="2.4" stroke-linecap="round"/><path d="M60 90 h22 M60 83 h22 M60 76 h22 M60 69 h22 M60 62 h22" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round" opacity=".95"/><path d="M58 90 q-5 -3.5 0 -7 M84 83 q5 -3.5 0 -7 M58 76 q-5 -3.5 0 -7 M84 69 q5 -3.5 0 -7" fill="none" stroke="'+c+'" stroke-width="3" stroke-linecap="round"/><path class="led" d="M64 50 q-5 -7 0 -12 M72 52 q-5 -7 0 -12 M80 50 q-5 -7 0 -12" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2" stroke-linecap="round"/>'}[k];
+return '<svg viewBox="0 0 100 120" aria-hidden="true">'+defs+s+'</svg>'}
+function pic(p){return '<div class="img" style="--h:'+p[7]+'">'+(p[8]?'<span class="tag">'+p[8]+'</span>':'')+art(p[6],p[7])+'</div>'}
+function setBar(t,fn){if(inTg){if(cur)tg.MainButton.offClick(cur);cur=fn;if(t){tg.MainButton.setParams({text:t,color:'#35f0c8',text_color:'#001a14'});tg.MainButton.onClick(fn);tg.MainButton.show()}else tg.MainButton.hide()}else{const b=$('bar');b.hidden=!t;b.textContent=t||'';b.onclick=fn||null}}
+const cnt=()=>Object.values(cart).reduce((a,b)=>a+b,0),tot=()=>Object.keys(cart).reduce((s,i)=>s+pr(i)[4]*cart[i],0);
+function chg(id,d){const q=Math.max(0,Math.min(pr(id)[5],(cart[id]||0)+d));if(q)cart[id]=q;else delete cart[id]}
+function show(n){['gate','shop','cart','done'].forEach(s=>$(s).hidden=s!==n);window.scrollTo(0,0);if(n==='shop')drawShop();else if(n==='cart')drawCart();else setBar('')}
+function ctl(id){const q=cart[id]||0;return q?'<div class="st"><button class="m" data-a="dec" data-id="'+id+'" aria-label="ÐÐµÐ½ÑÑÐµ">â</button><span>'+q+'</span><button data-a="inc" data-id="'+id+'" aria-label="ÐÐ¾Ð»ÑÑÐµ">+</button></div>':'<button class="add" data-a="inc" data-id="'+id+'" aria-label="Ð ÐºÐ¾ÑÐ·Ð¸Ð½Ñ">+</button>'}
+function drawShop(){
+uid=0;
+$('chips').innerHTML=C.map(c=>'<button class="chip'+(c[0]===cat?' on':'')+'" data-a="cat" data-c="'+c[0]+'">'+c[1]+'</button>').join('');
+$('grid').innerHTML=P.filter(p=>cat==='all'||p[1]===cat).map(p=>'<div class="card">'+pic(p)+'<div class="nm">'+p[2]+'</div><div class="ds">'+p[3]+'</div><div class="row"><span class="pr">'+R(p[4])+'</span>'+ctl(p[0])+'</div></div>').join('');
+const n=cnt();setBar(n?'ÐÐ¾ÑÐ·Ð¸Ð½Ð° Â· '+n+' Â· '+R(tot()):'',()=>show('cart'))}
+function drawCart(){
+uid=100;
+const ids=Object.keys(cart),has=ids.length>0;$('form').hidden=!has;
+$('items').innerHTML=has?ids.map(i=>{const p=pr(i);return '<div class="item">'+pic(p)+'<div class="t">'+p[2]+'<i>'+R(p[4]*cart[i])+'</i></div>'+ctl(p[0])+'</div>'}).join(''):'<div class="mid"><p class="sub">Ð ÐºÐ¾ÑÐ·Ð¸Ð½Ðµ Ð¿Ð¾ÐºÐ° Ð¿ÑÑÑÐ¾.</p></div>';
+setBar(has?'ÐÑÐ¾ÑÐ¼Ð¸ÑÑ Ð·Ð°ÐºÐ°Ð· Â· '+R(tot()):'',submit)}
+function submit(){
+    const f=['n','c','a'].map(x=>$(x).value.trim());
+    if(f.some(v=>!v)){$('err').textContent='ÐÐ°Ð¿Ð¾Ð»Ð½Ð¸ÑÐµ Ð¸Ð¼Ñ, ÐºÐ¾Ð½ÑÐ°ÐºÑ Ð¸ Ð°Ð´ÑÐµÑ';return}
+    $('err').textContent='ÐÑÐ¿ÑÐ°Ð²ÐºÐ°...';
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const uid = urlParams.get('uid') || (tg?.initDataUnsafe?.user?.id);
+
+    if(!uid) {
+        $('err').textContent='ÐÑÐ¸Ð±ÐºÐ°: Ð¿ÐµÑÐµÐ·Ð°Ð¿ÑÑÑÐ¸ÑÐµ Ð±Ð¾ÑÐ° ÐºÐ¾Ð¼Ð°Ð½Ð´Ð¾Ð¹ /start';
+        return;
+    }
+
+    const d={items:Object.keys(cart).map(i=>({id:+i,qty:cart[i]})),name:f[0],contact:f[1],address:f[2], telegram_id: uid};
+    
+    fetch('https://blackmist-bot.onrender.com/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(d)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if(res.error) { $('err').textContent = res.error; }
+        else {
+            $('sum').textContent='Ð¡ÑÐ¼Ð¼Ð° Ð·Ð°ÐºÐ°Ð·Ð°: '+R(tot())+'. ÐÑ ÑÐ²ÑÐ¶ÐµÐ¼ÑÑ Ñ Ð²Ð°Ð¼Ð¸.';
+            show('done');
+            if(inTg && tg.close) { setTimeout(()=>tg.close(), 2000); }
+        }
+    })
+    .catch(e => { $('err').textContent='ÐÑÐ¸Ð±ÐºÐ° ÑÐµÑÐ¸.'; });
+}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,id=+t.dataset.id;
+if(a==='cat'){cat=t.dataset.c;drawShop()}
+else if(a==='inc'||a==='dec'){chg(id,a==='inc'?1:-1);$('cart').hidden?drawShop():drawCart()}
+else if(a==='age'||a==='back')show('shop');
+else if(a==='again'){cart={};show('shop')}});
+if(tg){tg.ready();tg.expand();try{tg.setBackgroundColor('#000000');tg.setHeaderColor('#000000')}catch(e){}}
+if(!inTg)document.documentElement.classList.add('pv');
+show('gate');
+</script>
+</body>
+</html>
